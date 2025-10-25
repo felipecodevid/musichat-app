@@ -1,0 +1,1 @@
+// Constantes, enums, config global

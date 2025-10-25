@@ -1,0 +1,1 @@
+// Sincronización offline ↔ cloud

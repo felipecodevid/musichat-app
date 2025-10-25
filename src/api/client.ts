@@ -1,0 +1,1 @@
+// Config general (Supabase client)
