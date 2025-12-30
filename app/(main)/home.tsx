@@ -1,117 +1,143 @@
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
-import { db } from '@/db/client/sqlite';
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
-import migrations from '@/db/migrations/sqlite/migrations';
-import { MessagesService } from '@/services/messages-service/messages-service';
-import { useMessages } from '@/hooks/useMessages';
-import { useState } from 'react';
+import { View, StyleSheet, FlatList, Text, TouchableOpacity } from 'react-native';
 import { useAuthStore } from '@/store/useAuth';
-import { useRouter } from 'expo-router';
 import { supabase } from '@/db/client/supabase';
+import { useRouter } from 'expo-router';
+import { AlbumCard } from '@/components/albums/AlbumCard';
+import { Ionicons } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+// Mock Data
+const MOCK_ALBUMS = [
+  {
+    id: '1',
+    title: 'Summer Vibes 2024',
+    description: 'A collection of upbeat tracks for the sunny days ahead.',
+    coverImage: 'https://placehold.co/200/orange/white?text=Summer',
+    tags: ['Pop', 'Summer', 'Roadtrip']
+  },
+  {
+    id: '2',
+    title: 'Coding Focus',
+    description: 'Deep work instrumentals to get in the zone and ship code.',
+    coverImage: 'https://placehold.co/200/333333/white?text=Focus',
+    tags: ['Electronic', 'Instrumental', 'Work']
+  },
+  {
+    id: '3',
+    title: 'Late Night Jazz',
+    description: 'Smooth jazz for relaxing evenings with a glass of wine.',
+    coverImage: 'https://placehold.co/200/4a148c/white?text=Jazz',
+    tags: ['Jazz', 'Relax', 'Night']
+  },
+  {
+    id: '4',
+    title: 'Gym Pump',
+    description: 'High energy beats to crush your workout.',
+    coverImage: 'https://placehold.co/200/d32f2f/white?text=Gym',
+    tags: ['Rock', 'Workout', 'Energy']
+  }
+];
 
 export default function Main() {
   const router = useRouter();
-  const { error } = useMigrations(db, migrations);
-  const userId = useAuthStore((state) => state.userId);
   const logout = useAuthStore((state) => state.logout);
 
-  const { items, refresh, sync } = useMessages(userId ?? '')
-
-  const [message, setMessage] = useState("")
-
-  const handleLogout = () => {
-    supabase.auth.signOut()
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     logout();
     router.replace('/');
   };
 
-  if (error) {
-    return (
-      <View style={styles.container}>
-        <Text>Migration error: {error.message}</Text>
-      </View>
-    );
-  }
-
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Messages</Text>
-        <Button title="Sign Out" onPress={handleLogout} color="#FF3B30" />
+        <Text style={styles.headerTitle}>My Albums</Text>
+        <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
+          <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
+        </TouchableOpacity>
       </View>
 
-      <TextInput 
-        style={styles.input} 
-        value={message}
-        onChangeText={setMessage}
-        placeholder="Type a message..."
+      <FlatList
+        data={MOCK_ALBUMS}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <AlbumCard
+            title={item.title}
+            description={item.description}
+            coverImage={item.coverImage}
+            tags={item.tags}
+            onPress={() => {
+              router.push({
+                pathname: '/(main)/album/[id]',
+                params: { 
+                  id: item.id,
+                  title: item.title,
+                  coverImage: item.coverImage,
+                  description: item.description
+                }
+              });
+            }}
+          />
+        )}
+        contentContainerStyle={styles.listContent}
+        showsVerticalScrollIndicator={false}
       />
-      <Button title="Create message" onPress={async () => {
-        try {
-          if (!userId) {
-            console.error("No user ID found")
-            return
-          }
-          const messagesService = new MessagesService(userId)
-  
-          await messagesService.addMessage(message)
-          setMessage(""); // Clear input
-          await sync()
-        } catch (error) {
-          console.log(error)
-        }
-      }}></Button>
 
-      <View style={styles.spacer} />
-      <Button title="Sync & Refresh" onPress={sync} />
-
-      <View style={styles.list}>
-        {items.map((item) => (
-          <Text key={item.id} style={styles.item}>{item.content}</Text>
-        ))}
-      </View>
-    </View>
+      <TouchableOpacity 
+        style={styles.fab} 
+        activeOpacity={0.8}
+        onPress={() => router.push('/(main)/create-album')}
+      >
+        <Ionicons name="add" size={30} color="#fff" />
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: 60,
-    paddingHorizontal: 20,
+    backgroundColor: '#f8f9fa',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  title: {
-    fontSize: 24,
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#111',
   },
-  input: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 12,
+  logoutButton: {
+    padding: 8,
   },
-  spacer: {
-    height: 12,
+  listContent: {
+    padding: 20,
+    paddingBottom: 100, // Space for FAB
   },
-  list: {
-    marginTop: 20,
-    gap: 8,
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#007AFF', // iOS Blue or Brand Color
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
   },
-  item: {
-    fontSize: 16,
-    padding: 12,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    overflow: 'hidden',
-  }
 });
