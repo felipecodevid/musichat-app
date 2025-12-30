@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 import { db, schema } from '@/db/client/sqlite';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import migrations from '@/db/migrations/sqlite/migrations';
+import uuid from 'react-native-uuid';
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ function Main() {
 
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState('');
 
   useEffect(() => {
     if (!success) {
@@ -24,7 +26,7 @@ function Main() {
 
     const fetchUsers = async () => {
       console.log('fetching users');
-      const users = await db.query.users.findMany();
+      const users = await db.query.messages.findMany();
       console.log('users fetched');
       console.log(users);
       setUsers(users as any);
@@ -45,14 +47,25 @@ function Main() {
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>
       <StatusBar style="auto" />
-      <Button title="Add user" onPress={() => {
-        db.insert(schema.users).values({ name: 'John Doe', email: 'john.doe@example.com' }).then(() => {
-          console.log('user added');
-        });
+      <TextInput
+        style={styles.input}
+        placeholder="Enter content"
+        value={content}
+        onChangeText={setContent}
+      />
+      <Button title="Add message" onPress={async () => {
+        try {
+          console.log("adding message")
+          await db.insert(schema.messages).values({ content: content || 'Hello', id: uuid.v4() })
+          console.log("message added")
+          setContent('');
+        } catch (error) {
+          console.log(error);
+        }
       }} />
-      <Button title="Get users" onPress={async () => {
+      <Button title="Get messages" onPress={async () => {
         setLoading(true);
-        const users = await db.query.users.findMany();
+        const users = await db.query.messages.findMany();
         setUsers(users as any);
         setLoading(false);
       }} />
@@ -68,5 +81,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  input: {
+    width: '80%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
   },
 });
