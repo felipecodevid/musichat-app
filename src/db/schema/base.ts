@@ -1,0 +1,1 @@
+// Base schema for all tables
