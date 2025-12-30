@@ -14,7 +14,8 @@ export const messages = sqliteTable('messages', {
   content: text('content').notNull(),
   createdAt: integer('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
-  deviceId: text('device_id').notNull(),
+  userId: text('user_id').notNull(),
+  deviceId: text('device_id').notNull().default(sql`CURRENT_TIMESTAMP`),
   version: integer('version').notNull().default(0),
   deletedAt: integer('deleted_at'),
 });

@@ -5,29 +5,15 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1761416220390,
-      "tag": "0000_known_toad_men",
+      "when": 1767109184698,
+      "tag": "0000_uneven_lifeguard",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "6",
-      "when": 1767063070830,
-      "tag": "0001_glossy_the_executioner",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1767066240326,
-      "tag": "0002_calm_monster_badoon",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1767066972092,
-      "tag": "0003_sweet_king_bedlam",
+      "when": 1767112873884,
+      "tag": "0001_petite_mikhail_rasputin",
       "breakpoints": true
     }
   ]

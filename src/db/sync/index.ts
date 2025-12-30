@@ -4,7 +4,7 @@ import { pushChanges } from "./push";
 
 export async function syncAll(userId: string) {
   const net = await NetInfo.fetch();
-  if (!net.isConnected) return;
+  if (!net.isConnected || !userId) return;
 
   await pushChanges(userId);
   await pullChanges(userId);

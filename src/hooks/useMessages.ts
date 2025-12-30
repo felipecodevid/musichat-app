@@ -9,7 +9,7 @@ export function useMessages(userId: string) {
 
   async function refresh() {
     const rows = await db.select().from(messages)
-      .where(and(isNull(messages.deletedAt)));
+      .where(and(eq(messages.userId, userId), isNull(messages.deletedAt)));
     setItems(rows);
   }
 

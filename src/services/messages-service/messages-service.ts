@@ -1,26 +1,32 @@
 import { db, schema } from "@/db/client/sqlite";
 import { eq } from "drizzle-orm";
-import { nanoid } from "nanoid"
+import uuid from "react-native-uuid"
 
-const DEVICE_ID = "device_id_mock"
+// Mocked for now
+const DEVICE_ID = "fb0bb89f-9eb6-457d-ad90-2f22c5d828dd"
 
 export class MessagesService {
-  constructor(private userId: string) {}
+  constructor(private userId: string) { }
 
   async addMessage(content: string) {
     const now = Date.now();
-    const id = nanoid();
+    const id = uuid.v4();
 
-    await db.insert(schema.messages).values({ id, content, deviceId: DEVICE_ID, createdAt: now, updatedAt: now });
+    await db.insert(schema.messages).values({ id, content, deviceId: DEVICE_ID, createdAt: now, updatedAt: now, userId: this.userId });
 
     await db.insert(schema.outbox).values({
-      opId: nanoid(),
+      opId: uuid.v4(),
       table: "messages",
       type: "insert",
       payload: JSON.stringify({
-        id, userId: this.userId, content, done: false,
-        updated_at: now, deleted_at: null,
-        device_id: DEVICE_ID, version: 0,
+        id,
+        userId: this.userId,
+        content,
+        createdAt: now,
+        updatedAt: now,
+        deletedAt: null,
+        deviceId: DEVICE_ID,
+        version: 0,
       }),
       createdAt: now,
     });
@@ -38,7 +44,7 @@ export class MessagesService {
     await db.update(schema.messages).set({ content, updatedAt: now, version: nextVersion }).where(eq(schema.messages.id, id));
 
     await db.insert(schema.outbox).values({
-      opId: nanoid(),
+      opId: uuid.v4(),
       table: "messages",
       type: "update",
       payload: JSON.stringify({
@@ -46,6 +52,7 @@ export class MessagesService {
         content,
         updatedAt: now,
         version: nextVersion,
+        userId: this.userId,
       }),
       createdAt: now,
     });
@@ -61,7 +68,7 @@ export class MessagesService {
     await db.update(schema.messages).set({ deletedAt: now, updatedAt: now, version: nextVersion }).where(eq(schema.messages.id, id));
 
     await db.insert(schema.outbox).values({
-      opId: nanoid(),
+      opId: uuid.v4(),
       table: "messages",
       type: "delete",
       payload: JSON.stringify({
@@ -69,6 +76,7 @@ export class MessagesService {
         deletedAt: now,
         updatedAt: now,
         version: nextVersion,
+        userId: this.userId,
       }),
       createdAt: now,
     });

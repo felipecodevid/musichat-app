@@ -16,7 +16,7 @@ TaskManager.defineTask(TASK_NAME, async () => {
   }
 });
 
-export async function registerBackgroundSync() {
+export default async function registerBackgroundSync() {
   await BackgroundFetch.registerTaskAsync(TASK_NAME, {
     minimumInterval: 15 * 60, // 15 min
     stopOnTerminate: false,
