@@ -1,0 +1,2 @@
+ALTER TABLE "songs" ADD COLUMN "album_id" uuid NOT NULL;--> statement-breakpoint
+ALTER TABLE "songs" ADD CONSTRAINT "songs_album_id_albums_id_fk" FOREIGN KEY ("album_id") REFERENCES "public"."albums"("id") ON DELETE no action ON UPDATE no action;

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ChatListItemProps {
   name: string;
@@ -14,10 +15,16 @@ interface ChatListItemProps {
 export function ChatListItem({ name, lastMessage, timestamp, avatarUrl, unreadCount, tags, onPress }: ChatListItemProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={styles.container}>
-      <Image 
-        source={{ uri: avatarUrl || 'https://placehold.co/100/png?text=C' }} 
-        style={styles.avatar} 
-      />
+      {avatarUrl ? (
+        <Image 
+          source={{ uri: avatarUrl }} 
+          style={styles.avatar} 
+        />
+      ) : (
+        <View style={[styles.avatar, styles.placeholder]}>
+          <Ionicons name="chatbubble-ellipses" size={24} color="#8e8e93" />
+        </View>
+      )}
       
       <View style={styles.contentContainer}>
         <View style={styles.topRow}>
@@ -64,6 +71,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginRight: 15,
     backgroundColor: '#e1e4e8',
+  },
+  placeholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentContainer: {
     flex: 1,

@@ -1,0 +1,1 @@
+ALTER TABLE `songs` ADD `album_id` text NOT NULL REFERENCES albums(id);
