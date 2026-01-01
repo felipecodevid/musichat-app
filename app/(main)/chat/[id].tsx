@@ -1,14 +1,15 @@
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform, Animated } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
+import AudioRecorder from '@/components/chat/AudioRecorder';
 
 import { useMessages } from '@/hooks/useMessages';
 import { useSong } from '@/hooks/useSong';
 import { useAuthStore } from '@/store/useAuth';
-
 import { useCreateMessage } from '@/hooks/useCreateMessage';
+import { useAudioRecording } from '@/hooks/chat/useAudioRecording';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -20,10 +21,21 @@ export default function ChatScreen() {
   const { createMessage, isLoading: isSending } = useCreateMessage();
   const [refreshing, setRefreshing] = useState(false);
 
+  const {
+    isRecording,
+    isLocked,
+    recordedUri,
+    pan,
+    panY,
+    cancelRecording,
+    forceStopRecording, // Use this for the 'send' action when locked (or validation before send)
+    panResponder
+  } = useAudioRecording();
+
   const onRefresh = async () => {
     setRefreshing(true);
     await sync();
-    setRefreshing(false);
+  setRefreshing(false)
   };
 
   const handleSend = async () => {
@@ -73,30 +85,56 @@ export default function ChatScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <View style={styles.inputContainer}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="add" size={24} color="#007AFF" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="images-outline" size={24} color="#007AFF" />
-          </TouchableOpacity>
+          {isRecording ? (
+            <View style={{ flex: 1 }}>
+               <AudioRecorder 
+                 onCancel={cancelRecording} 
+                 onSend={forceStopRecording} 
+                 translateX={pan}
+                 isLocked={isLocked}
+               />
+            </View>
+          ) : (
+            <>
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="add" size={24} color="#007AFF" />
+              </TouchableOpacity>
+              
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="images-outline" size={24} color="#007AFF" />
+              </TouchableOpacity>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Message..."
-            value={messageText}
-            onChangeText={setMessageText}
-            multiline
-          />
+              <TextInput
+                style={styles.input}
+                placeholder="Message..."
+                value={messageText}
+                onChangeText={setMessageText}
+                multiline
+              />
+            </>
+          )}
 
           {messageText.length > 0 ? (
              <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={isSending}>
                <Ionicons name="arrow-up-circle" size={32} color={isSending ? "#ccc" : "#007AFF"} />
              </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="mic-outline" size={24} color="#007AFF" />
-            </TouchableOpacity>
+            !isLocked && (
+            <Animated.View 
+              style={[
+                  styles.iconButton, 
+                  isRecording && { transform: [{ scale: 1.2 }] },
+                  { transform: [{ translateY: panY }] } 
+              ]} 
+              {...panResponder.panHandlers}
+            >
+              <Ionicons 
+                name={isRecording ? "mic" : "mic-outline"} 
+                size={24} 
+                color={isRecording ? "#FF3B30" : "#007AFF"} 
+              />
+            </Animated.View>
+            )
           )}
         </View>
       </KeyboardAvoidingView>
