@@ -1,0 +1,1 @@
+ALTER TABLE `messages` ADD `song_id` text NOT NULL REFERENCES songs(id);

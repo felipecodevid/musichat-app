@@ -34,6 +34,7 @@ export async function pullMessages(userId: string) {
         .values({
           id: r.id,
           content: r.content,
+          songId: r.song_id,
           createdAt: remoteCreatedTs,
           deletedAt: r.deleted_at ? new Date(r.deleted_at).getTime() : null,
           deviceId: r.device_id,
@@ -45,6 +46,7 @@ export async function pullMessages(userId: string) {
           target: messages.id,
           set: {
             content: r.content,
+            songId: r.song_id,
             updatedAt: remoteTs,
             deletedAt: r.deleted_at ? new Date(r.deleted_at).getTime() : null,
             deviceId: r.device_id,

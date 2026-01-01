@@ -7,6 +7,7 @@ export const messages = pgTable('messages', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   userId: uuid('user_id').notNull(),
+  songId: uuid('song_id').notNull().references(() => songs.id),
   deviceId: uuid('device_id').notNull(),
   version: integer('version').notNull().default(0),
   deletedAt: timestamp('deleted_at'),

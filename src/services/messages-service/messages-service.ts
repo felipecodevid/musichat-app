@@ -8,11 +8,11 @@ const DEVICE_ID = "fb0bb89f-9eb6-457d-ad90-2f22c5d828dd"
 export class MessagesService {
   constructor(private userId: string) { }
 
-  async addMessage(content: string) {
+  async addMessage(content: string, songId: string) {
     const now = Date.now();
     const id = uuid.v4();
 
-    await db.insert(schema.messages).values({ id, content, deviceId: DEVICE_ID, createdAt: now, updatedAt: now, userId: this.userId });
+    await db.insert(schema.messages).values({ id, content, songId, deviceId: DEVICE_ID, createdAt: now, updatedAt: now, userId: this.userId });
 
     await db.insert(schema.outbox).values({
       opId: uuid.v4(),
@@ -22,6 +22,7 @@ export class MessagesService {
         id,
         userId: this.userId,
         content,
+        songId,
         createdAt: now,
         updatedAt: now,
         deletedAt: null,

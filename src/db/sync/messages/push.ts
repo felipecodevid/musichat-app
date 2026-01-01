@@ -30,6 +30,7 @@ export async function pushMessages(userId: string) {
     return {
       id: payload.id,
       content: payload.content,
+      song_id: payload.songId || payload.song_id,
       created_at: safeDate(payload.createdAt || payload.created_at),
       updated_at: safeDate(payload.updatedAt || payload.updated_at),
       user_id: payload.userId || payload.user_id || userId,

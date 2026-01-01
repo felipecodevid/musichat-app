@@ -7,6 +7,7 @@ export const messages = sqliteTable('messages', {
   createdAt: integer('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   userId: text('user_id').notNull(),
+  songId: text('song_id').notNull().references(() => songs.id),
   deviceId: text('device_id').notNull().default(sql`CURRENT_TIMESTAMP`),
   version: integer('version').notNull().default(0),
   deletedAt: integer('deleted_at'),
