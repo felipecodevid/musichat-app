@@ -1,46 +1,32 @@
-import { View, StyleSheet, FlatList, Text, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuthStore } from '@/store/useAuth';
 import { supabase } from '@/db/client/supabase';
 import { useRouter } from 'expo-router';
 import { AlbumCard } from '@/components/albums/AlbumCard';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons'
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Mock Data
-const MOCK_ALBUMS = [
-  {
-    id: '1',
-    title: 'Summer Vibes 2024',
-    description: 'A collection of upbeat tracks for the sunny days ahead.',
-    coverImage: 'https://placehold.co/200/orange/white?text=Summer',
-    tags: ['Pop', 'Summer', 'Roadtrip']
-  },
-  {
-    id: '2',
-    title: 'Coding Focus',
-    description: 'Deep work instrumentals to get in the zone and ship code.',
-    coverImage: 'https://placehold.co/200/333333/white?text=Focus',
-    tags: ['Electronic', 'Instrumental', 'Work']
-  },
-  {
-    id: '3',
-    title: 'Late Night Jazz',
-    description: 'Smooth jazz for relaxing evenings with a glass of wine.',
-    coverImage: 'https://placehold.co/200/4a148c/white?text=Jazz',
-    tags: ['Jazz', 'Relax', 'Night']
-  },
-  {
-    id: '4',
-    title: 'Gym Pump',
-    description: 'High energy beats to crush your workout.',
-    coverImage: 'https://placehold.co/200/d32f2f/white?text=Gym',
-    tags: ['Rock', 'Workout', 'Energy']
-  }
-];
+import { useAlbums } from '@/hooks/useAlbums';
+import { useFocusEffect } from 'expo-router';
+import { useCallback } from 'react';
+import { syncAll } from '@/db/sync';
 
 export default function Main() {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
+  const userId = useAuthStore((state) => state.userId);
+  const { items: albums, refresh } = useAlbums(userId || '');
+
+  // Sync data and refresh UI when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (userId) {
+        // Sync with server when app comes to foreground
+        syncAll(userId)
+          .then(() => refresh())
+          .catch(console.error);
+      }
+    }, [userId])
+  );
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -57,31 +43,51 @@ export default function Main() {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={MOCK_ALBUMS}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <AlbumCard
-            title={item.title}
-            description={item.description}
-            coverImage={item.coverImage}
-            tags={item.tags}
-            onPress={() => {
-              router.push({
-                pathname: '/(main)/album/[id]',
-                params: { 
-                  id: item.id,
-                  title: item.title,
-                  coverImage: item.coverImage,
-                  description: item.description
-                }
-              });
-            }}
-          />
-        )}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {albums.length === 0 ? (
+        <View style={styles.emptyState}>
+          <View style={styles.emptyIconContainer}>
+            <Ionicons name="musical-notes" size={48} color="#fff" />
+          </View>
+          <Text style={styles.emptyTitle}>Your music collection awaits</Text>
+          <Text style={styles.emptySubtitle}>
+            Create your first album to start organizing your favorite tracks and memories
+          </Text>
+          <TouchableOpacity 
+            style={styles.emptyButton}
+            onPress={() => router.push('/(main)/create-album')}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="add" size={20} color="#fff" />
+            <Text style={styles.emptyButtonText}>Create Album</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={albums}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <AlbumCard
+              title={item.name}
+              description={item.description || ''}
+              coverImage={undefined}
+              tags={item.tags ? JSON.parse(item.tags) : []}
+              onPress={() => {
+                router.push({
+                  pathname: '/(main)/album/[id]',
+                  params: { 
+                    id: item.id,
+                    title: item.name,
+                    coverImage: '',
+                    description: item.description || ''
+                  }
+                });
+              }}
+            />
+          )}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
 
       <TouchableOpacity 
         style={styles.fab} 
@@ -120,6 +126,60 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 20,
     paddingBottom: 100, // Space for FAB
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+    paddingBottom: 60,
+  },
+  emptyIconContainer: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#007AFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  emptyTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 15,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  emptyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 25,
+    gap: 8,
+    shadowColor: '#007AFF',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  emptyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   fab: {
     position: 'absolute',

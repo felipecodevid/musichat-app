@@ -1,17 +1,22 @@
 import { sql } from 'drizzle-orm';
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
-  name: text('name').notNull(),
-  email: text('email').notNull().unique(),
-  createdAt: integer('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: integer('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
-});
-
 export const messages = sqliteTable('messages', {
   id: text('id').primaryKey(),
   content: text('content').notNull(),
+  createdAt: integer('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  userId: text('user_id').notNull(),
+  deviceId: text('device_id').notNull().default(sql`CURRENT_TIMESTAMP`),
+  version: integer('version').notNull().default(0),
+  deletedAt: integer('deleted_at'),
+});
+
+export const albums = sqliteTable('albums', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  tags: text('tags'),  // JSON array stored as string
   createdAt: integer('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   userId: text('user_id').notNull(),

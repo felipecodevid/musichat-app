@@ -1,10 +1,12 @@
-import { db } from "../client/sqlite";
-import { messages, meta } from "../schema/sqlite";
-import { supabase } from "../client/supabase";
+import { db } from "../../client/sqlite";
+import { messages, meta } from "../../schema/sqlite";
+import { supabase } from "../../client/supabase";
 import { eq } from "drizzle-orm";
 
-export async function pullChanges(userId: string) {
-  const last = await db.query.meta.findFirst({ where: eq(meta.key, "last_sync_at") });
+const META_KEY = "messages_last_sync_at";
+
+export async function pullMessages(userId: string) {
+  const last = await db.query.meta.findFirst({ where: eq(meta.key, META_KEY) });
   const lastSync = last?.value ?? "1970-01-01T00:00:00.000Z";
 
   const { data, error } = await supabase
@@ -21,28 +23,32 @@ export async function pullChanges(userId: string) {
 
   for (const r of data ?? []) {
     const local = localById.get(r.id);
-    // regla: last-write-wins (por updated_at)
+    // Last-write-wins strategy based on updated_at
     const remoteTs = new Date(r.updated_at).getTime();
     const remoteCreatedTs = new Date(r.created_at).getTime();
     const localTs = local?.updatedAt ?? 0;
 
     if (!local || remoteTs >= localTs) {
-      // aplicar remoto
       await db
         .insert(messages)
         .values({
-          id: r.id, content: r.content, createdAt: remoteCreatedTs,
+          id: r.id,
+          content: r.content,
+          createdAt: remoteCreatedTs,
           deletedAt: r.deleted_at ? new Date(r.deleted_at).getTime() : null,
-          deviceId: r.device_id, version: r.version,
+          deviceId: r.device_id,
+          version: r.version,
           updatedAt: remoteTs,
           userId,
         })
         .onConflictDoUpdate({
           target: messages.id,
           set: {
-            content: r.content, updatedAt: remoteTs,
+            content: r.content,
+            updatedAt: remoteTs,
             deletedAt: r.deleted_at ? new Date(r.deleted_at).getTime() : null,
-            deviceId: r.device_id, version: r.version,
+            deviceId: r.device_id,
+            version: r.version,
           },
         });
     }
@@ -50,6 +56,7 @@ export async function pullChanges(userId: string) {
 
   const nowIso = new Date().toISOString();
   await db
-    .insert(meta).values({ key: "last_sync_at", value: nowIso })
+    .insert(meta)
+    .values({ key: META_KEY, value: nowIso })
     .onConflictDoUpdate({ target: meta.key, set: { value: nowIso } });
 }

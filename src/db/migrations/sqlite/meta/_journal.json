@@ -15,6 +15,13 @@
       "when": 1767112873884,
       "tag": "0001_petite_mikhail_rasputin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1767289296461,
+      "tag": "0002_misty_war_machine",
+      "breakpoints": true
     }
   ]
 }

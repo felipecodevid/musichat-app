@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 interface AlbumCardProps {
   title: string;
   description: string;
-  coverImage: string;
+  coverImage?: string;
   tags: string[];
   onPress?: () => void;
 }
@@ -12,7 +13,13 @@ interface AlbumCardProps {
 export function AlbumCard({ title, description, coverImage, tags, onPress }: AlbumCardProps) {
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={styles.card}>
-      <Image source={{ uri: coverImage }} style={styles.image} />
+      {coverImage ? (
+        <Image source={{ uri: coverImage }} style={styles.image} />
+      ) : (
+        <View style={[styles.image, styles.placeholder]}>
+          <Ionicons name="musical-notes" size={32} color="#bbb" />
+        </View>
+      )}
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={1}>{title}</Text>
         <Text style={styles.description} numberOfLines={2}>{description}</Text>
@@ -50,6 +57,10 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 8,
     backgroundColor: '#eee',
+  },
+  placeholder: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     flex: 1,

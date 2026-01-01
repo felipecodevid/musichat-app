@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Image, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useCreateAlbum } from '@/hooks/useCreateAlbum';
 
 export default function CreateAlbum() {
   const router = useRouter();
+  const { createAlbum, isLoading, error } = useCreateAlbum();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [tagInput, setTagInput] = useState('');
@@ -23,10 +25,17 @@ export default function CreateAlbum() {
     setTags(tags.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleCreate = () => {
-    // Mock creation logic
-    console.log('Creating album:', { title, description, tags, coverImage });
-    router.back();
+  const handleCreate = async () => {
+    const id = await createAlbum({ 
+      name: title, 
+      description: description || undefined 
+    });
+    
+    if (id) {
+      router.back();
+    } else if (error) {
+      Alert.alert('Error', error.message);
+    }
   };
 
   const handleImagePick = () => {
@@ -42,8 +51,12 @@ export default function CreateAlbum() {
           <Text style={styles.cancelText}>Cancel</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>New Album</Text>
-        <TouchableOpacity onPress={handleCreate} style={styles.headerBtn} disabled={!title}>
-          <Text style={[styles.doneText, !title && styles.disabledText]}>Done</Text>
+        <TouchableOpacity onPress={handleCreate} style={styles.headerBtn} disabled={!title || isLoading}>
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#007AFF" />
+          ) : (
+            <Text style={[styles.doneText, !title && styles.disabledText]}>Done</Text>
+          )}
         </TouchableOpacity>
       </View>
 

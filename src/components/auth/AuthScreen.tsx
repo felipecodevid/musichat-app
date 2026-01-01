@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '@/db/client/supabase';
 import { AuthInput } from './AuthInput';
 import { AuthButton } from './AuthButton';
+import { registerBackgroundSync } from '../../../app/background';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -20,17 +21,22 @@ export default function AuthScreen() {
   const [loading, setLoading] = useState(false);
   const setGlobalUserId = useAuthStore((state) => state.setUserId);
 
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
         setGlobalUserId(session.user.id);
+        // Register background sync when session is restored
+        await registerBackgroundSync();
         router.replace('/(main)/home');
       }
     });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session) {
         setGlobalUserId(session.user.id);
+        // Register background sync on auth state change
+        await registerBackgroundSync();
         router.replace('/(main)/home');
       }
     });
@@ -65,6 +71,8 @@ export default function AuthScreen() {
         
         if (data.user) {
           setGlobalUserId(data.user.id);
+          // Register background sync after successful login
+          await registerBackgroundSync();
           router.replace('/(main)/home');
         }
       } else {
@@ -80,6 +88,8 @@ export default function AuthScreen() {
           Alert.alert('Success', 'Account created! Please check your email for verification if required, or sign in.');
           
           if (data.session) {
+             // Register background sync after successful signup
+             await registerBackgroundSync();
              router.replace('/(main)/home');
           } else {
              setIsLogin(true);
