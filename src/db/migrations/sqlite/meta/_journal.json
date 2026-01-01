@@ -43,6 +43,13 @@
       "when": 1767293929551,
       "tag": "0005_petite_sleepwalker",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1767305628568,
+      "tag": "0006_clean_titanium_man",
+      "breakpoints": true
     }
   ]
 }

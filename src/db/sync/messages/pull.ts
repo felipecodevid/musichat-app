@@ -41,6 +41,8 @@ export async function pullMessages(userId: string) {
           version: r.version,
           updatedAt: remoteTs,
           userId,
+          type: r.type,
+          mediaUri: r.media_uri,
         })
         .onConflictDoUpdate({
           target: messages.id,
@@ -51,6 +53,8 @@ export async function pullMessages(userId: string) {
             deletedAt: r.deleted_at ? new Date(r.deleted_at).getTime() : null,
             deviceId: r.device_id,
             version: r.version,
+            type: r.type,
+            mediaUri: r.media_uri,
           },
         });
     }

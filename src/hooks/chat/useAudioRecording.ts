@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Alert, Animated, PanResponder, PanResponderGestureState, GestureResponderEvent } from 'react-native';
 import { Audio } from 'expo-av';
 
-export const useAudioRecording = () => {
+export const useAudioRecording = (onRecordingComplete?: (uri: string) => void) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [recordedUri, setRecordedUri] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export const useAudioRecording = () => {
         if (uri) {
           console.log('Recording stopped and stored at', uri);
           setRecordedUri(uri);
-          Alert.alert("Recorded!", "Audio saved to state.");
+          onRecordingComplete?.(uri);
         }
         recordingRef.current = null;
       }

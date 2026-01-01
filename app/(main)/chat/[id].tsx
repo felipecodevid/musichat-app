@@ -2,7 +2,8 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, Keyboard
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import AudioMessage from '@/components/chat/AudioMessage';
 import AudioRecorder from '@/components/chat/AudioRecorder';
 
 import { useMessages } from '@/hooks/useMessages';
@@ -21,6 +22,23 @@ export default function ChatScreen() {
   const { createMessage, isLoading: isSending } = useCreateMessage();
   const [refreshing, setRefreshing] = useState(false);
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await sync();
+    setRefreshing(false)
+  };
+
+  const handleSendAudio = useCallback(async (uri: string) => {
+    console.log("audio uri: ", uri)
+    await createMessage({
+      songId: id,
+      content: 'Audio Message',
+      type: 'audio',
+      mediaUri: uri
+    });
+    await sync();
+  }, [id, createMessage, sync]);
+
   const {
     isRecording,
     isLocked,
@@ -30,13 +48,7 @@ export default function ChatScreen() {
     cancelRecording,
     forceStopRecording, // Use this for the 'send' action when locked (or validation before send)
     panResponder
-  } = useAudioRecording();
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await sync();
-  setRefreshing(false)
-  };
+  } = useAudioRecording(handleSendAudio);
 
   const handleSend = async () => {
     if (!messageText.trim()) return;
@@ -68,7 +80,11 @@ export default function ChatScreen() {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.messageBubble}>
-            <Text style={styles.messageText}>{item.content}</Text>
+            {item.type === 'audio' && item.mediaUri ? (
+               <AudioMessage uri={item.mediaUri} />
+            ) : (
+               <Text style={styles.messageText}>{item.content}</Text>
+            )}
             <Text style={styles.timestamp}>
               {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </Text>

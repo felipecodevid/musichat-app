@@ -37,6 +37,8 @@ export async function pushMessages(userId: string) {
       device_id: payload.deviceId || payload.device_id,
       version: payload.version,
       deleted_at: safeDateNullable(payload.deletedAt || payload.deleted_at),
+      type: payload.type || 'text',
+      media_uri: payload.mediaUri || payload.media_uri,
     };
   });
 

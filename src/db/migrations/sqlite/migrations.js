@@ -7,6 +7,7 @@ import m0002 from './0002_misty_war_machine.sql';
 import m0003 from './0003_mighty_cyclops.sql';
 import m0004 from './0004_amusing_phantom_reporter.sql';
 import m0005 from './0005_petite_sleepwalker.sql';
+import m0006 from './0006_clean_titanium_man.sql';
 
   export default {
     journal,
@@ -16,7 +17,8 @@ m0001,
 m0002,
 m0003,
 m0004,
-m0005
+m0005,
+m0006
     }
   }
   

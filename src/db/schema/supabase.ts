@@ -4,6 +4,8 @@ import { pgTable, uuid, varchar, timestamp, text, integer, pgPolicy } from 'driz
 export const messages = pgTable('messages', {
   id: uuid('id').primaryKey().defaultRandom(),
   content: text('content').notNull(),
+  type: text('type').notNull().default('text'), // 'text' | 'audio'
+  mediaUri: text('media_uri'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
   userId: uuid('user_id').notNull(),

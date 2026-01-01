@@ -5,6 +5,8 @@ import { MessagesService } from "@/services/messages-service/messages-service";
 interface CreateMessageInput {
   songId: string;
   content: string;
+  type?: 'text' | 'audio';
+  mediaUri?: string;
 }
 
 interface UseCreateMessageReturn {
@@ -29,7 +31,7 @@ export function useCreateMessage(): UseCreateMessageReturn {
 
     try {
       const service = new MessagesService(userId);
-      const id = await service.addMessage(input.content, input.songId);
+      const id = await service.addMessage(input.content, input.songId, input.type, input.mediaUri);
       return id as string;
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to create message"));

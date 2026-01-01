@@ -19,11 +19,21 @@ export class MessagesService {
       );
   }
 
-  async addMessage(content: string, songId: string) {
+  async addMessage(content: string, songId: string, type: 'text' | 'audio' = 'text', mediaUri?: string) {
     const now = Date.now();
     const id = uuid.v4();
 
-    await db.insert(schema.messages).values({ id, content, songId, deviceId: DEVICE_ID, createdAt: now, updatedAt: now, userId: this.userId });
+    await db.insert(schema.messages).values({
+      id,
+      content,
+      songId,
+      deviceId: DEVICE_ID,
+      createdAt: now,
+      updatedAt: now,
+      userId: this.userId,
+      type,
+      mediaUri
+    });
 
     await db.insert(schema.outbox).values({
       opId: uuid.v4(),
@@ -39,6 +49,8 @@ export class MessagesService {
         deletedAt: null,
         deviceId: DEVICE_ID,
         version: 0,
+        type,
+        mediaUri
       }),
       createdAt: now,
     });

@@ -4,6 +4,8 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 export const messages = sqliteTable('messages', {
   id: text('id').primaryKey(),
   content: text('content').notNull(),
+  type: text('type').notNull().default('text'), // 'text' | 'audio'
+  mediaUri: text('media_uri'),
   createdAt: integer('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: integer('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   userId: text('user_id').notNull(),
