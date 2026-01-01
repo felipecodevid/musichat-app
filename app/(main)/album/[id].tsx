@@ -70,7 +70,10 @@ export default function AlbumChatList() {
               timestamp={formatTimestamp(item.updatedAt)}
               unreadCount={0}
               tags={parseTags(item.tags)}
-              onPress={() => console.log('Chat pressed', item.id)}
+              onPress={() => router.push({
+                pathname: '/(main)/chat/[id]',
+                params: { id: item.id }
+              })}
             />
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}

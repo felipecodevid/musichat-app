@@ -1,0 +1,162 @@
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+
+// Mock data for initial UI visualization
+const MOCK_MESSAGES = [
+  { id: '1', text: 'Hey, this is a test message!', timestamp: Date.now() - 3600000 },
+  { id: '2', text: 'Another message here.', timestamp: Date.now() - 1800000 },
+  { id: '3', text: 'This UI looks great.', timestamp: Date.now() },
+];
+
+export default function ChatScreen() {
+  const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const [messageText, setMessageText] = useState('');
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#007AFF" />
+          <Text style={styles.backText}>Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Chat</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {/* Messages List */}
+      <FlatList
+        data={MOCK_MESSAGES}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.messageBubble}>
+            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={styles.timestamp}>
+              {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Text>
+          </View>
+        )}
+        contentContainerStyle={styles.listContent}
+        inverted={false}
+      />
+
+      {/* Input Area */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
+      >
+        <View style={styles.inputContainer}>
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="add" size={24} color="#007AFF" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.iconButton}>
+            <Ionicons name="images-outline" size={24} color="#007AFF" />
+          </TouchableOpacity>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Message..."
+            value={messageText}
+            onChangeText={setMessageText}
+            multiline
+          />
+
+          {messageText.length > 0 ? (
+             <TouchableOpacity style={styles.sendButton}>
+               <Ionicons name="arrow-up-circle" size={32} color="#007AFF" />
+             </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.iconButton}>
+              <Ionicons name="mic-outline" size={24} color="#007AFF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e5ea',
+    backgroundColor: '#f6f6f6',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backText: {
+    fontSize: 17,
+    color: '#007AFF',
+    marginLeft: 4,
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#000',
+  },
+  listContent: {
+    padding: 16,
+    gap: 12,
+  },
+  messageBubble: {
+    alignSelf: 'flex-end', // Sender side only
+    backgroundColor: '#007AFF',
+    borderRadius: 20,
+    borderBottomRightRadius: 4, // distinct shape for sender
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    maxWidth: '80%',
+  },
+  messageText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  timestamp: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.7)',
+    alignSelf: 'flex-end',
+    marginTop: 4,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e5ea',
+    backgroundColor: '#f6f6f6',
+    gap: 10,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    fontSize: 16,
+    maxHeight: 100,
+    borderWidth: 1,
+    borderColor: '#e5e5ea',
+  },
+  iconButton: {
+    padding: 4,
+  },
+  sendButton: {
+    padding: 0,
+  },
+});
