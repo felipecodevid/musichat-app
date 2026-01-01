@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
-import { db } from "../db/client/sqlite";
-import { messages } from "../db/schema/sqlite";
-import { eq, and, isNull } from "drizzle-orm";
+import { MessagesService } from "@/services/messages-service/messages-service";
 import { syncAll } from "../db/sync";
 
-export function useMessages(userId: string) {
+export function useMessages(userId: string, songId: string) {
   const [items, setItems] = useState<any[]>([]);
 
   async function refresh() {
-    const rows = await db.select().from(messages)
-      .where(and(eq(messages.userId, userId), isNull(messages.deletedAt)));
+    const service = new MessagesService(userId);
+    const rows = await service.getMessages(songId);
     setItems(rows);
   }
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [userId, songId]);
 
   async function sync() {
     await syncAll(userId);

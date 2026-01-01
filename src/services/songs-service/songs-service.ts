@@ -1,5 +1,5 @@
 import { db, schema } from "@/db/client/sqlite";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import uuid from "react-native-uuid"
 
 // Mocked for now
@@ -100,6 +100,11 @@ export class SongsService {
         userId: this.userId,
       }),
       createdAt: now,
+    });
+  }
+  async getSong(id: string) {
+    return await db.query.songs.findFirst({
+      where: and(eq(schema.songs.id, id), eq(schema.songs.userId, this.userId), isNull(schema.songs.deletedAt))
     });
   }
 }

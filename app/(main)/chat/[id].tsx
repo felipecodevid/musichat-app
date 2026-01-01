@@ -4,17 +4,39 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 
-// Mock data for initial UI visualization
-const MOCK_MESSAGES = [
-  { id: '1', text: 'Hey, this is a test message!', timestamp: Date.now() - 3600000 },
-  { id: '2', text: 'Another message here.', timestamp: Date.now() - 1800000 },
-  { id: '3', text: 'This UI looks great.', timestamp: Date.now() },
-];
+import { useMessages } from '@/hooks/useMessages';
+import { useSong } from '@/hooks/useSong';
+import { useAuthStore } from '@/store/useAuth';
+
+import { useCreateMessage } from '@/hooks/useCreateMessage';
 
 export default function ChatScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const [messageText, setMessageText] = useState('');
+  const userId = useAuthStore(s => s.userId);
+  const { song } = useSong(id, userId || "");
+  const { items: messages, refresh, sync } = useMessages(userId || "", id);
+  const { createMessage, isLoading: isSending } = useCreateMessage();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await sync();
+    setRefreshing(false);
+  };
+
+  const handleSend = async () => {
+    if (!messageText.trim()) return;
+    
+    await createMessage({
+      songId: id,
+      content: messageText.trim()
+    });
+    
+    setMessageText('');
+    await sync();
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
@@ -24,24 +46,25 @@ export default function ChatScreen() {
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
           <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Chat</Text>
+        <Text style={styles.headerTitle}>{song?.name ?? 'Chat'}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       {/* Messages List */}
       <FlatList
-        data={MOCK_MESSAGES}
+        data={messages}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.messageBubble}>
-            <Text style={styles.messageText}>{item.text}</Text>
+            <Text style={styles.messageText}>{item.content}</Text>
             <Text style={styles.timestamp}>
-              {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </Text>
           </View>
         )}
         contentContainerStyle={styles.listContent}
-        inverted={false}
+        onRefresh={onRefresh}
+        refreshing={refreshing}
       />
 
       {/* Input Area */}
@@ -67,8 +90,8 @@ export default function ChatScreen() {
           />
 
           {messageText.length > 0 ? (
-             <TouchableOpacity style={styles.sendButton}>
-               <Ionicons name="arrow-up-circle" size={32} color="#007AFF" />
+             <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={isSending}>
+               <Ionicons name="arrow-up-circle" size={32} color={isSending ? "#ccc" : "#007AFF"} />
              </TouchableOpacity>
           ) : (
             <TouchableOpacity style={styles.iconButton}>

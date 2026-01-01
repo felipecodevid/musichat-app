@@ -1,5 +1,5 @@
 import { db, schema } from "@/db/client/sqlite";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import uuid from "react-native-uuid"
 
 // Mocked for now
@@ -7,6 +7,17 @@ const DEVICE_ID = "fb0bb89f-9eb6-457d-ad90-2f22c5d828dd"
 
 export class MessagesService {
   constructor(private userId: string) { }
+
+  async getMessages(songId: string) {
+    return await db.select().from(schema.messages)
+      .where(
+        and(
+          eq(schema.messages.userId, this.userId),
+          eq(schema.messages.songId, songId),
+          isNull(schema.messages.deletedAt)
+        )
+      );
+  }
 
   async addMessage(content: string, songId: string) {
     const now = Date.now();
