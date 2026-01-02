@@ -20,6 +20,7 @@ export default function Main() {
   useFocusEffect(
     useCallback(() => {
       if (userId) {
+        console.log("Running sync all for: ", userId)
         // Sync with server when app comes to foreground
         syncAll(userId)
           .then(() => refresh())
@@ -52,7 +53,7 @@ export default function Main() {
           <Text style={styles.emptySubtitle}>
             Create your first album to start organizing your favorite tracks and memories
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.emptyButton}
             onPress={() => router.push('/(main)/create-album')}
             activeOpacity={0.8}
@@ -74,7 +75,7 @@ export default function Main() {
               onPress={() => {
                 router.push({
                   pathname: '/(main)/album/[id]',
-                  params: { 
+                  params: {
                     id: item.id,
                     title: item.name,
                     coverImage: '',
@@ -89,8 +90,8 @@ export default function Main() {
         />
       )}
 
-      <TouchableOpacity 
-        style={styles.fab} 
+      <TouchableOpacity
+        style={styles.fab}
         activeOpacity={0.8}
         onPress={() => router.push('/(main)/create-album')}
       >

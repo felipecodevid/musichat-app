@@ -1,19 +1,21 @@
-import { db } from "../../client/sqlite";
-import { messages, meta } from "../../schema/sqlite";
-import { supabase } from "../../client/supabase";
-import { eq } from "drizzle-orm";
+import { db } from '../../client/sqlite';
+import { messages, meta } from '../../schema/sqlite';
+import { supabase } from '../../client/supabase';
+import { eq, and } from 'drizzle-orm';
 
-const META_KEY = "messages_last_sync_at";
+const META_KEY = 'messages_last_sync_at';
 
 export async function pullMessages(userId: string) {
-  const last = await db.query.meta.findFirst({ where: eq(meta.key, META_KEY) });
-  const lastSync = last?.value ?? "1970-01-01T00:00:00.000Z";
+  const last = await db.query.meta.findFirst({
+    where: and(eq(meta.key, META_KEY), eq(meta.userId, userId)),
+  });
+  const lastSync = last?.value ?? '1970-01-01T00:00:00.000Z';
 
   const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .gt("updated_at", lastSync)
-    .eq("user_id", userId);
+    .from('messages')
+    .select('*')
+    .gt('updated_at', lastSync)
+    .eq('user_id', userId);
 
   if (error) throw error;
 
@@ -63,6 +65,9 @@ export async function pullMessages(userId: string) {
   const nowIso = new Date().toISOString();
   await db
     .insert(meta)
-    .values({ key: META_KEY, value: nowIso })
-    .onConflictDoUpdate({ target: meta.key, set: { value: nowIso } });
+    .values({ userId, key: META_KEY, value: nowIso })
+    .onConflictDoUpdate({
+      target: [meta.userId, meta.key],
+      set: { value: nowIso },
+    });
 }
