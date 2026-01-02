@@ -4,11 +4,13 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCreateSong } from '@/hooks/useCreateSong';
+import { useTranslation } from '@/i18n';
 
 export default function CreateSong() {
   const router = useRouter();
   const { albumId, albumTitle } = useLocalSearchParams<{ albumId: string, albumTitle: string }>();
   const { createSong, isLoading, error } = useCreateSong();
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   // const [tagInput, setTagInput] = useState('');
@@ -27,20 +29,20 @@ export default function CreateSong() {
 
   const handleCreate = async () => {
     if (!albumId) {
-      Alert.alert('Error', 'Album ID is missing');
+      Alert.alert(t.common.error, t.createSong.errorAlbumIdMissing);
       return;
     }
 
-    const id = await createSong({ 
+    const id = await createSong({
       albumId,
-      name, 
-      description: description || undefined 
+      name,
+      description: description || undefined
     });
-    
+
     if (id) {
       router.back();
     } else if (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert(t.common.error, error.message);
     }
   };
 
@@ -49,21 +51,21 @@ export default function CreateSong() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t.common.cancel}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>New Chat</Text>
+        <Text style={styles.headerTitle}>{t.createSong.title}</Text>
         <TouchableOpacity onPress={handleCreate} style={styles.headerBtn} disabled={!name || isLoading}>
           {isLoading ? (
             <ActivityIndicator size="small" color="#007AFF" />
           ) : (
-            <Text style={[styles.doneText, !name && styles.disabledText]}>Done</Text>
+            <Text style={[styles.doneText, !name && styles.disabledText]}>{t.common.done}</Text>
           )}
         </TouchableOpacity>
       </View>
 
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoidingView} 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -71,16 +73,16 @@ export default function CreateSong() {
           <View style={styles.albumContext}>
             <Ionicons name="disc-outline" size={20} color="#8e8e93" />
             <Text style={styles.albumContextText}>
-              Adding to <Text style={styles.albumName}>{albumTitle || 'Album'}</Text>
+              {t.createSong.addingTo} <Text style={styles.albumName}>{albumTitle || t.createSong.album}</Text>
             </Text>
           </View>
 
           {/* Form Fields */}
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Chat Name</Text>
+            <Text style={styles.label}>{t.createSong.chatName}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. Verse Ideas, Feedback Request"
+              placeholder={t.createSong.chatNamePlaceholder}
               value={name}
               onChangeText={setName}
               placeholderTextColor="#999"
@@ -89,10 +91,10 @@ export default function CreateSong() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>{t.createSong.description}</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
-              placeholder="What's this chat about?"
+              placeholder={t.createSong.descriptionPlaceholder}
               value={description}
               onChangeText={setDescription}
               multiline

@@ -11,6 +11,7 @@ import { useSong } from '@/hooks/useSong';
 import { useAuthStore } from '@/store/useAuth';
 import { useCreateMessage } from '@/hooks/useCreateMessage';
 import { useAudioRecording } from '@/hooks/chat/useAudioRecording';
+import { useTranslation } from '@/i18n';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function ChatScreen() {
   const { items: messages, refresh, sync } = useMessages(userId || "", id);
   const { createMessage, isLoading: isSending } = useCreateMessage();
   const [refreshing, setRefreshing] = useState(false);
+  const { t } = useTranslation();
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -32,12 +34,12 @@ export default function ChatScreen() {
     console.log("audio uri: ", uri)
     await createMessage({
       songId: id,
-      content: 'Audio Message',
+      content: t.chat.audioMessage,
       type: 'audio',
       mediaUri: uri
     });
     await sync();
-  }, [id, createMessage, sync]);
+  }, [id, createMessage, sync, t.chat.audioMessage]);
 
   const {
     isRecording,
@@ -52,12 +54,12 @@ export default function ChatScreen() {
 
   const handleSend = async () => {
     if (!messageText.trim()) return;
-    
+
     await createMessage({
       songId: id,
       content: messageText.trim()
     });
-    
+
     setMessageText('');
     await sync();
   };
@@ -68,9 +70,9 @@ export default function ChatScreen() {
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#007AFF" />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>{t.common.back}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{song?.name ?? 'Chat'}</Text>
+        <Text style={styles.headerTitle}>{song?.name ?? t.chat.title}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -81,9 +83,9 @@ export default function ChatScreen() {
         renderItem={({ item }) => (
           <View style={styles.messageBubble}>
             {item.type === 'audio' && item.mediaUri ? (
-               <AudioMessage uri={item.mediaUri} />
+              <AudioMessage uri={item.mediaUri} />
             ) : (
-               <Text style={styles.messageText}>{item.content}</Text>
+              <Text style={styles.messageText}>{item.content}</Text>
             )}
             <Text style={styles.timestamp}>
               {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -103,26 +105,26 @@ export default function ChatScreen() {
         <View style={styles.inputContainer}>
           {isRecording ? (
             <View style={{ flex: 1 }}>
-               <AudioRecorder 
-                 onCancel={cancelRecording} 
-                 onSend={forceStopRecording} 
-                 translateX={pan}
-                 isLocked={isLocked}
-               />
+              <AudioRecorder
+                onCancel={cancelRecording}
+                onSend={forceStopRecording}
+                translateX={pan}
+                isLocked={isLocked}
+              />
             </View>
           ) : (
             <>
               <TouchableOpacity style={styles.iconButton}>
                 <Ionicons name="add" size={24} color="#007AFF" />
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.iconButton}>
                 <Ionicons name="images-outline" size={24} color="#007AFF" />
               </TouchableOpacity>
 
               <TextInput
                 style={styles.input}
-                placeholder="Message..."
+                placeholder={t.chat.messagePlaceholder}
                 value={messageText}
                 onChangeText={setMessageText}
                 multiline
@@ -131,25 +133,25 @@ export default function ChatScreen() {
           )}
 
           {messageText.length > 0 ? (
-             <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={isSending}>
-               <Ionicons name="arrow-up-circle" size={32} color={isSending ? "#ccc" : "#007AFF"} />
-             </TouchableOpacity>
+            <TouchableOpacity style={styles.sendButton} onPress={handleSend} disabled={isSending}>
+              <Ionicons name="arrow-up-circle" size={32} color={isSending ? "#ccc" : "#007AFF"} />
+            </TouchableOpacity>
           ) : (
             !isLocked && (
-            <Animated.View 
-              style={[
-                  styles.iconButton, 
+              <Animated.View
+                style={[
+                  styles.iconButton,
                   isRecording && { transform: [{ scale: 1.2 }] },
-                  { transform: [{ translateY: panY }] } 
-              ]} 
-              {...panResponder.panHandlers}
-            >
-              <Ionicons 
-                name={isRecording ? "mic" : "mic-outline"} 
-                size={24} 
-                color={isRecording ? "#FF3B30" : "#007AFF"} 
-              />
-            </Animated.View>
+                  { transform: [{ translateY: panY }] }
+                ]}
+                {...panResponder.panHandlers}
+              >
+                <Ionicons
+                  name={isRecording ? "mic" : "mic-outline"}
+                  size={24}
+                  color={isRecording ? "#FF3B30" : "#007AFF"}
+                />
+              </Animated.View>
             )
           )}
         </View>

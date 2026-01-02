@@ -9,12 +9,14 @@ import { useAlbums } from '@/hooks/useAlbums';
 import { useFocusEffect } from 'expo-router';
 import { useCallback } from 'react';
 import { syncAll } from '@/db/sync';
+import { useTranslation } from '@/i18n';
 
 export default function Main() {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
   const userId = useAuthStore((state) => state.userId);
   const { items: albums, refresh } = useAlbums(userId || '');
+  const { t } = useTranslation();
 
   // Sync data and refresh UI when screen comes into focus
   useFocusEffect(
@@ -38,7 +40,7 @@ export default function Main() {
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Albums</Text>
+        <Text style={styles.headerTitle}>{t.home.title}</Text>
         <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
           <Ionicons name="log-out-outline" size={24} color="#FF3B30" />
         </TouchableOpacity>
@@ -49,9 +51,9 @@ export default function Main() {
           <View style={styles.emptyIconContainer}>
             <Ionicons name="musical-notes" size={48} color="#fff" />
           </View>
-          <Text style={styles.emptyTitle}>Your music collection awaits</Text>
+          <Text style={styles.emptyTitle}>{t.home.emptyTitle}</Text>
           <Text style={styles.emptySubtitle}>
-            Create your first album to start organizing your favorite tracks and memories
+            {t.home.emptySubtitle}
           </Text>
           <TouchableOpacity
             style={styles.emptyButton}
@@ -59,7 +61,7 @@ export default function Main() {
             activeOpacity={0.8}
           >
             <Ionicons name="add" size={20} color="#fff" />
-            <Text style={styles.emptyButtonText}>Create Album</Text>
+            <Text style={styles.emptyButtonText}>{t.home.createAlbum}</Text>
           </TouchableOpacity>
         </View>
       ) : (

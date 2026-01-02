@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from '@/i18n';
 
 interface AudioRecorderProps {
   onCancel: () => void;
@@ -12,6 +13,7 @@ interface AudioRecorderProps {
 export default function AudioRecorder({ onCancel, onSend, translateX, isLocked }: AudioRecorderProps) {
   const [duration, setDuration] = useState(0);
   const pulseAnim = useState(new Animated.Value(1))[0];
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Timer
@@ -46,70 +48,70 @@ export default function AudioRecorder({ onCancel, onSend, translateX, isLocked }
 
   const slideStyle = translateX ? {
     opacity: translateX.interpolate({
-        inputRange: [-100, 0],
-        outputRange: [0, 1],
-        extrapolate: 'clamp',
+      inputRange: [-100, 0],
+      outputRange: [0, 1],
+      extrapolate: 'clamp',
     }),
     transform: [{
-        translateX: translateX.interpolate({
-            inputRange: [-100, 0],
-            outputRange: [-20, 0], 
-            extrapolate: 'clamp',
-        })
+      translateX: translateX.interpolate({
+        inputRange: [-100, 0],
+        outputRange: [-20, 0],
+        extrapolate: 'clamp',
+      })
     }]
   } : {};
 
   if (isLocked) {
-      return (
-        <View style={[
-            styles.container, 
-            { 
-                height: 'auto', 
-                minHeight: 120, 
-                alignItems: 'flex-end', 
-                paddingBottom: 16,
-                paddingHorizontal: 16,
-                backgroundColor: '#f5f5f5',
-                borderRadius: 24,
-                marginHorizontal: 10,
-                marginBottom: 10,
-            }
-        ]}> 
-            <View style={{ alignItems: 'center', gap: 12 }}>
-                 <Text style={[styles.timerText, { fontSize: 24, marginLeft: 0 }]}>{formatTime(duration)}</Text>
-                 <TouchableOpacity onPress={onCancel} style={{ padding: 8 }}>
-                     <Ionicons name="trash-outline" size={32} color="#FF3B30" />
-                 </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity 
-              onPress={onSend} 
-              style={{ 
-                width: 48, 
-                height: 48, 
-                borderRadius: 24, 
-                backgroundColor: '#007AFF', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                marginRight: 4
-              }}
-            >
-                <Ionicons name="arrow-up" size={28} color="#fff" />
-            </TouchableOpacity>
+    return (
+      <View style={[
+        styles.container,
+        {
+          height: 'auto',
+          minHeight: 120,
+          alignItems: 'flex-end',
+          paddingBottom: 16,
+          paddingHorizontal: 16,
+          backgroundColor: '#f5f5f5',
+          borderRadius: 24,
+          marginHorizontal: 10,
+          marginBottom: 10,
+        }
+      ]}>
+        <View style={{ alignItems: 'center', gap: 12 }}>
+          <Text style={[styles.timerText, { fontSize: 24, marginLeft: 0 }]}>{formatTime(duration)}</Text>
+          <TouchableOpacity onPress={onCancel} style={{ padding: 8 }}>
+            <Ionicons name="trash-outline" size={32} color="#FF3B30" />
+          </TouchableOpacity>
         </View>
-      );
+
+        <TouchableOpacity
+          onPress={onSend}
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: '#007AFF',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 4
+          }}
+        >
+          <Ionicons name="arrow-up" size={28} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.centerContainer, slideStyle]}>
-         <Ionicons name="chevron-back" size={20} color="#8E8E93" />
-         <Text style={styles.cancelText}>Swipe to cancel</Text>
+        <Ionicons name="chevron-back" size={20} color="#8E8E93" />
+        <Text style={styles.cancelText}>{t.chat.swipeToCancel}</Text>
       </Animated.View>
 
       <View style={styles.leftContainer}>
         <Animated.View style={{ opacity: pulseAnim }}>
-            <Ionicons name="mic" size={20} color="#FF3B30" />
+          <Ionicons name="mic" size={20} color="#FF3B30" />
         </Animated.View>
         <Text style={styles.timerText}>{formatTime(duration)}</Text>
       </View>

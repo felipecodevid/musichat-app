@@ -6,11 +6,13 @@ import { ChatListItem } from '@/components/chat/ChatListItem';
 import { useSongs } from '@/hooks/useSongs';
 import { useAuthStore } from '@/store/useAuth';
 import { useCallback } from 'react';
+import { useTranslation } from '@/i18n';
 
 export default function AlbumChatList() {
   const router = useRouter();
   const { id, title } = useLocalSearchParams<{ id: string, title: string }>();
   const userId = useAuthStore((state) => state.userId);
+  const { t } = useTranslation();
 
   const { items: chats, refresh } = useSongs(userId || '', id);
 
@@ -52,10 +54,10 @@ export default function AlbumChatList() {
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color="#007AFF" />
-            <Text style={styles.backText}>{title || 'Albums'}</Text>
+            <Text style={styles.backText}>{title || t.common.albums}</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.headerTitle}>Chats</Text>
+        <Text style={styles.headerTitle}>{t.albumChatList.title}</Text>
         <TouchableOpacity style={styles.actionButton}>
           <Ionicons name="create-outline" size={24} color="#007AFF" />
         </TouchableOpacity>
@@ -64,8 +66,8 @@ export default function AlbumChatList() {
       {chats.length === 0 ? (
         <View style={styles.emptyState}>
           <Ionicons name="chatbubbles-outline" size={64} color="#c7c7cc" />
-          <Text style={styles.emptyText}>No chats yet</Text>
-          <Text style={styles.emptySubtext}>Start a new conversation</Text>
+          <Text style={styles.emptyText}>{t.albumChatList.emptyTitle}</Text>
+          <Text style={styles.emptySubtext}>{t.albumChatList.emptySubtitle}</Text>
         </View>
       ) : (
         <FlatList
@@ -74,7 +76,7 @@ export default function AlbumChatList() {
           renderItem={({ item }) => (
             <ChatListItem
               name={item.name}
-              lastMessage={item.description || 'No messages yet'}
+              lastMessage={item.description || t.albumChatList.noMessagesYet}
               timestamp={formatTimestamp(item.updatedAt)}
               unreadCount={0}
               tags={parseTags(item.tags)}

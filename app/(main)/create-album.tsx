@@ -4,10 +4,12 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useCreateAlbum } from '@/hooks/useCreateAlbum';
+import { useTranslation } from '@/i18n';
 
 export default function CreateAlbum() {
   const router = useRouter();
   const { createAlbum, isLoading, error } = useCreateAlbum();
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   // const [tagInput, setTagInput] = useState('');
@@ -26,15 +28,15 @@ export default function CreateAlbum() {
   // };
 
   const handleCreate = async () => {
-    const id = await createAlbum({ 
-      name: title, 
-      description: description || undefined 
+    const id = await createAlbum({
+      name: title,
+      description: description || undefined
     });
-    
+
     if (id) {
       router.back();
     } else if (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert(t.common.error, error.message);
     }
   };
 
@@ -48,21 +50,21 @@ export default function CreateAlbum() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.headerBtn}>
-          <Text style={styles.cancelText}>Cancel</Text>
+          <Text style={styles.cancelText}>{t.common.cancel}</Text>
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>New Album</Text>
+        <Text style={styles.headerTitle}>{t.createAlbum.title}</Text>
         <TouchableOpacity onPress={handleCreate} style={styles.headerBtn} disabled={!title || isLoading}>
           {isLoading ? (
             <ActivityIndicator size="small" color="#007AFF" />
           ) : (
-            <Text style={[styles.doneText, !title && styles.disabledText]}>Done</Text>
+            <Text style={[styles.doneText, !title && styles.disabledText]}>{t.common.done}</Text>
           )}
         </TouchableOpacity>
       </View>
 
-      <KeyboardAvoidingView 
-        style={styles.keyboardAvoidingView} 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
@@ -74,7 +76,7 @@ export default function CreateAlbum() {
               ) : (
                 <View style={styles.placeholderContent}>
                   <Ionicons name="camera" size={40} color="#007AFF" />
-                  <Text style={styles.uploadText}>Add Cover Photo</Text>
+                  <Text style={styles.uploadText}>{t.createAlbum.addCoverPhoto}</Text>
                 </View>
               )}
             </TouchableOpacity>
@@ -82,10 +84,10 @@ export default function CreateAlbum() {
 
           {/* Form Fields */}
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Album Name</Text>
+            <Text style={styles.label}>{t.createAlbum.albumName}</Text>
             <TextInput
               style={styles.input}
-              placeholder="e.g. Summer Vibes"
+              placeholder={t.createAlbum.albumNamePlaceholder}
               value={title}
               onChangeText={setTitle}
               placeholderTextColor="#999"
@@ -93,10 +95,10 @@ export default function CreateAlbum() {
           </View>
 
           <View style={styles.formGroup}>
-            <Text style={styles.label}>Description</Text>
+            <Text style={styles.label}>{t.createAlbum.description}</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
-              placeholder="What's this album about?"
+              placeholder={t.createAlbum.descriptionPlaceholder}
               value={description}
               onChangeText={setDescription}
               multiline

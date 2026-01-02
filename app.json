@@ -31,7 +31,8 @@
     },
     "plugins": [
       "expo-router",
-      "expo-background-task"
+      "expo-background-task",
+      "expo-localization"
     ],
     "extra": {
       "router": {},

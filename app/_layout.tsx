@@ -3,6 +3,7 @@ import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { db } from '@/db/client/sqlite';
 import migrations from '@/db/migrations/sqlite/migrations';
 import { Text, View } from 'react-native';
+import { I18nProvider } from '@/i18n';
 
 // Import background module to ensure TaskManager.defineTask runs at startup
 import './background';
@@ -29,9 +30,11 @@ export default function RootLayout() {
   console.log('SQLite migrations applied');
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-      <Stack.Screen name="(main)" />
-    </Stack>
+    <I18nProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(main)" />
+      </Stack>
+    </I18nProvider>
   );
 }
