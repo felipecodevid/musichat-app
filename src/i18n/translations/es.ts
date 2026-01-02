@@ -63,4 +63,25 @@ export const es: Translations = {
     migrationError: 'Error de migración:',
     runningMigrations: 'Ejecutando migraciones...',
   },
+
+  // Auth Screen
+  auth: {
+    welcomeBack: 'Bienvenido de nuevo',
+    createAccount: 'Crea tu cuenta',
+    email: 'Correo electrónico',
+    emailPlaceholder: 'hola@ejemplo.com',
+    password: 'Contraseña',
+    passwordPlaceholder: 'Ingresa tu contraseña',
+    confirmPassword: 'Confirmar contraseña',
+    confirmPasswordPlaceholder: 'Confirma tu contraseña',
+    signIn: 'Iniciar sesión',
+    signUp: 'Registrarse',
+    noAccount: '¿No tienes una cuenta? ',
+    hasAccount: '¿Ya tienes una cuenta? ',
+    fillAllFields: 'Por favor completa todos los campos',
+    passwordsDoNotMatch: 'Las contraseñas no coinciden',
+    accountCreated:
+      '¡Cuenta creada! Por favor revisa tu correo para verificación si es necesario, o inicia sesión.',
+    success: 'Éxito',
+  },
 };

@@ -7,6 +7,7 @@ import { supabase } from '@/db/client/supabase';
 import { AuthInput } from './AuthInput';
 import { AuthButton } from './AuthButton';
 import { registerBackgroundSync } from '../../../app/background';
+import { useTranslation } from '@/i18n';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -14,6 +15,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 
 export default function AuthScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,12 +54,12 @@ export default function AuthScreen() {
 
   const handleAuth = async () => {
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t.common.error, t.auth.fillAllFields);
       return;
     }
 
     if (!isLogin && password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(t.common.error, t.auth.passwordsDoNotMatch);
       return;
     }
 
@@ -88,7 +90,7 @@ export default function AuthScreen() {
 
         if (data.user) {
           setGlobalUserId(data.user.id);
-          Alert.alert('Success', 'Account created! Please check your email for verification if required, or sign in.');
+          Alert.alert(t.auth.success, t.auth.accountCreated);
 
           if (data.session) {
             // Register background sync after successful signup
@@ -100,7 +102,7 @@ export default function AuthScreen() {
         }
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      Alert.alert(t.common.error, error.message);
     } finally {
       setLoading(false);
     }
@@ -127,17 +129,17 @@ export default function AuthScreen() {
           <View style={styles.iconContainer}>
             <Ionicons name="musical-notes" size={40} color="#FFFFFF" />
           </View>
-          <Text style={styles.title}>MusicChat</Text>
+          <Text style={styles.title}>MusiChat</Text>
           <Text style={styles.subtitle}>
-            {isLogin ? 'Welcome back' : 'Create your account'}
+            {isLogin ? t.auth.welcomeBack : t.auth.createAccount}
           </Text>
         </View>
 
         <View style={styles.form}>
           <AuthInput
-            label="Email"
+            label={t.auth.email}
             icon="mail-outline"
-            placeholder="hello@example.com"
+            placeholder={t.auth.emailPlaceholder}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -145,9 +147,9 @@ export default function AuthScreen() {
           />
 
           <AuthInput
-            label="Password"
+            label={t.auth.password}
             icon="lock-closed-outline"
-            placeholder="Enter your password"
+            placeholder={t.auth.passwordPlaceholder}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -155,9 +157,9 @@ export default function AuthScreen() {
 
           {!isLogin && (
             <AuthInput
-              label="Confirm Password"
+              label={t.auth.confirmPassword}
               icon="lock-closed-outline"
-              placeholder="Confirm your password"
+              placeholder={t.auth.confirmPasswordPlaceholder}
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
@@ -165,18 +167,18 @@ export default function AuthScreen() {
           )}
 
           <AuthButton
-            title={isLogin ? 'Sign In' : 'Sign Up'}
+            title={isLogin ? t.auth.signIn : t.auth.signUp}
             onPress={handleAuth}
             loading={loading}
           />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
+              {isLogin ? t.auth.noAccount : t.auth.hasAccount}
             </Text>
             <TouchableOpacity onPress={toggleMode}>
               <Text style={styles.linkText}>
-                {isLogin ? 'Sign Up' : 'Sign In'}
+                {isLogin ? t.auth.signUp : t.auth.signIn}
               </Text>
             </TouchableOpacity>
           </View>

@@ -61,6 +61,27 @@ export const en = {
     migrationError: 'Migration error:',
     runningMigrations: 'Running migrations...',
   },
+
+  // Auth Screen
+  auth: {
+    welcomeBack: 'Welcome back',
+    createAccount: 'Create your account',
+    email: 'Email',
+    emailPlaceholder: 'hello@example.com',
+    password: 'Password',
+    passwordPlaceholder: 'Enter your password',
+    confirmPassword: 'Confirm Password',
+    confirmPasswordPlaceholder: 'Confirm your password',
+    signIn: 'Sign In',
+    signUp: 'Sign Up',
+    noAccount: "Don't have an account? ",
+    hasAccount: 'Already have an account? ',
+    fillAllFields: 'Please fill in all fields',
+    passwordsDoNotMatch: 'Passwords do not match',
+    accountCreated:
+      'Account created! Please check your email for verification if required, or sign in.',
+    success: 'Success',
+  },
 } as const;
 
 // Structural type that allows different string values for each language
@@ -111,5 +132,23 @@ export type Translations = {
   layout: {
     migrationError: string;
     runningMigrations: string;
+  };
+  auth: {
+    welcomeBack: string;
+    createAccount: string;
+    email: string;
+    emailPlaceholder: string;
+    password: string;
+    passwordPlaceholder: string;
+    confirmPassword: string;
+    confirmPasswordPlaceholder: string;
+    signIn: string;
+    signUp: string;
+    noAccount: string;
+    hasAccount: string;
+    fillAllFields: string;
+    passwordsDoNotMatch: string;
+    accountCreated: string;
+    success: string;
   };
 };
