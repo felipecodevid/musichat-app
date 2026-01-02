@@ -10,20 +10,20 @@ export default function CreateAlbum() {
   const { createAlbum, isLoading, error } = useCreateAlbum();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
+  // const [tagInput, setTagInput] = useState('');
+  // const [tags, setTags] = useState<string[]>([]);
   const [coverImage, setCoverImage] = useState<string | null>(null);
 
-  const handleAddTag = () => {
-    if (tagInput.trim()) {
-      setTags([...tags, tagInput.trim()]);
-      setTagInput('');
-    }
-  };
+  // const handleAddTag = () => {
+  //   if (tagInput.trim()) {
+  //     setTags([...tags, tagInput.trim()]);
+  //     setTagInput('');
+  //   }
+  // };
 
-  const removeTag = (indexToRemove: number) => {
-    setTags(tags.filter((_, index) => index !== indexToRemove));
-  };
+  // const removeTag = (indexToRemove: number) => {
+  //   setTags(tags.filter((_, index) => index !== indexToRemove));
+  // };
 
   const handleCreate = async () => {
     const id = await createAlbum({ 
@@ -106,8 +106,8 @@ export default function CreateAlbum() {
             />
           </View>
 
-          {/* Tags Section */}
-          <View style={styles.formGroup}>
+          {/* Tags Section - Hidden for now */}
+          {/* <View style={styles.formGroup}>
             <Text style={styles.label}>Tags</Text>
             <View style={styles.tagInputContainer}>
               <TextInput
@@ -133,7 +133,7 @@ export default function CreateAlbum() {
                 </View>
               ))}
             </View>
-          </View>
+          </View> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
