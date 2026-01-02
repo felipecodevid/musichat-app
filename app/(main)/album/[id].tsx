@@ -11,7 +11,7 @@ export default function AlbumChatList() {
   const router = useRouter();
   const { id, title } = useLocalSearchParams<{ id: string, title: string }>();
   const userId = useAuthStore((state) => state.userId);
-  
+
   const { items: chats, refresh } = useSongs(userId || '', id);
 
   // Refresh list when screen comes into focus (e.g. after creating a song)
@@ -24,7 +24,15 @@ export default function AlbumChatList() {
   // Format timestamp for display
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const today = new Date();
+    const isToday = date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth() &&
+      date.getDate() === today.getDate();
+
+    if (isToday) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
   };
 
   // Parse tags from JSON string
@@ -49,7 +57,7 @@ export default function AlbumChatList() {
         </View>
         <Text style={styles.headerTitle}>Chats</Text>
         <TouchableOpacity style={styles.actionButton}>
-             <Ionicons name="create-outline" size={24} color="#007AFF" />
+          <Ionicons name="create-outline" size={24} color="#007AFF" />
         </TouchableOpacity>
       </View>
 
@@ -82,8 +90,8 @@ export default function AlbumChatList() {
       )}
 
       {/* Floating Action Button */}
-      <TouchableOpacity 
-        style={styles.fab} 
+      <TouchableOpacity
+        style={styles.fab}
         activeOpacity={0.8}
         onPress={() => router.push({
           pathname: '/(main)/album/create-song',
@@ -112,7 +120,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f6f6f6', // Light gray iOS style header
   },
   headerRow: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
@@ -133,7 +141,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-    zIndex: -1, 
+    zIndex: -1,
   },
   actionButton: {
     padding: 4,

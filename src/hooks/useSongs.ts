@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { db } from "../db/client/sqlite";
-import { songs } from "../db/schema/sqlite";
-import { eq, and, isNull } from "drizzle-orm";
-import { syncAll } from "../db/sync";
+import { useEffect, useState } from 'react';
+import { db } from '../db/client/sqlite';
+import { songs } from '../db/schema/sqlite';
+import { eq, and, isNull, desc } from 'drizzle-orm';
+import { syncAll } from '../db/sync';
 
 export function useSongs(userId: string, albumId?: string) {
   const [items, setItems] = useState<any[]>([]);
@@ -14,8 +14,11 @@ export function useSongs(userId: string, albumId?: string) {
       conditions.push(eq(songs.albumId, albumId));
     }
 
-    const rows = await db.select().from(songs)
-      .where(and(...conditions));
+    const rows = await db
+      .select()
+      .from(songs)
+      .where(and(...conditions))
+      .orderBy(desc(songs.updatedAt));
     setItems(rows);
   }
 
@@ -30,4 +33,3 @@ export function useSongs(userId: string, albumId?: string) {
 
   return { items, refresh, sync };
 }
-
