@@ -10,5 +10,3 @@ CREATE TABLE `albums` (
 	`version` integer DEFAULT 0 NOT NULL,
 	`deleted_at` integer
 );
---> statement-breakpoint
-DROP TABLE `users`;

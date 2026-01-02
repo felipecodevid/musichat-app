@@ -54,14 +54,19 @@ export default function ChatScreen() {
 
   const handleSend = async () => {
     if (!messageText.trim()) return;
+    const content = messageText.trim();
+    setMessageText(''); // Clear input immediately for snappy UX
 
     await createMessage({
       songId: id,
-      content: messageText.trim()
+      content
     });
 
-    setMessageText('');
-    await sync();
+    // Optimistic update: refresh from local SQLite immediately
+    await refresh();
+
+    // Sync with server in background (don't await)
+    sync();
   };
 
   return (
