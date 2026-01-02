@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, LayoutAnimation, UIManager, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, LayoutAnimation, UIManager, Alert, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '@/store/useAuth';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,6 +19,7 @@ export default function AuthScreen() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const setGlobalUserId = useAuthStore((state) => state.setUserId);
 
 
@@ -29,6 +30,8 @@ export default function AuthScreen() {
         // Register background sync when session is restored
         await registerBackgroundSync();
         router.replace('/(main)/home');
+      } else {
+        setIsCheckingAuth(false);
       }
     });
 
@@ -68,7 +71,7 @@ export default function AuthScreen() {
         });
 
         if (error) throw error;
-        
+
         if (data.user) {
           setGlobalUserId(data.user.id);
           // Register background sync after successful login
@@ -86,13 +89,13 @@ export default function AuthScreen() {
         if (data.user) {
           setGlobalUserId(data.user.id);
           Alert.alert('Success', 'Account created! Please check your email for verification if required, or sign in.');
-          
+
           if (data.session) {
-             // Register background sync after successful signup
-             await registerBackgroundSync();
-             router.replace('/(main)/home');
+            // Register background sync after successful signup
+            await registerBackgroundSync();
+            router.replace('/(main)/home');
           } else {
-             setIsLogin(true);
+            setIsLogin(true);
           }
         }
       }
@@ -103,8 +106,19 @@ export default function AuthScreen() {
     }
   };
 
+  if (isCheckingAuth) {
+    return (
+      <View style={styles.loadingContainer}>
+        <View style={styles.iconContainer}>
+          <Ionicons name="musical-notes" size={40} color="#FFFFFF" />
+        </View>
+        <ActivityIndicator size="large" color="#000000" style={styles.loader} />
+      </View>
+    );
+  }
+
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
@@ -120,41 +134,41 @@ export default function AuthScreen() {
         </View>
 
         <View style={styles.form}>
-            <AuthInput
-              label="Email"
-              icon="mail-outline"
-              placeholder="hello@example.com"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
+          <AuthInput
+            label="Email"
+            icon="mail-outline"
+            placeholder="hello@example.com"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
 
+          <AuthInput
+            label="Password"
+            icon="lock-closed-outline"
+            placeholder="Enter your password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+
+          {!isLogin && (
             <AuthInput
-              label="Password"
+              label="Confirm Password"
               icon="lock-closed-outline"
-              placeholder="Enter your password"
-              value={password}
-              onChangeText={setPassword}
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
               secureTextEntry
             />
+          )}
 
-            {!isLogin && (
-              <AuthInput
-                label="Confirm Password"
-                icon="lock-closed-outline"
-                placeholder="Confirm your password"
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
-              />
-            )}
-
-            <AuthButton
-              title={isLogin ? 'Sign In' : 'Sign Up'}
-              onPress={handleAuth}
-              loading={loading}
-            />
+          <AuthButton
+            title={isLogin ? 'Sign In' : 'Sign Up'}
+            onPress={handleAuth}
+            loading={loading}
+          />
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
@@ -173,6 +187,15 @@ export default function AuthScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loader: {
+    marginTop: 24,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
