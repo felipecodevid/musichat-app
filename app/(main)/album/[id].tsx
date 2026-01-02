@@ -1,9 +1,10 @@
-import { View, StyleSheet, FlatList, TouchableOpacity, Text } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ChatListItem } from '@/components/chat/ChatListItem';
 import { useSongs } from '@/hooks/useSongs';
+import { useDeleteSong } from '@/hooks/useDeleteSong';
 import { useAuthStore } from '@/store/useAuth';
 import { useCallback } from 'react';
 import { useTranslation } from '@/i18n';
@@ -13,6 +14,7 @@ export default function AlbumChatList() {
   const { id, title } = useLocalSearchParams<{ id: string, title: string }>();
   const userId = useAuthStore((state) => state.userId);
   const { t } = useTranslation();
+  const { deleteSong } = useDeleteSong();
 
   const { items: chats, refresh } = useSongs(userId || '', id);
 
@@ -22,6 +24,63 @@ export default function AlbumChatList() {
       refresh();
     }, [id])
   );
+
+  // Handle long press to show edit/delete menu
+  const handleLongPress = (item: { id: string; name: string; description: string | null }) => {
+    Alert.alert(
+      item.name,
+      undefined,
+      [
+        {
+          text: t.common.edit,
+          onPress: () => {
+            router.push({
+              pathname: '/(main)/album/edit-song',
+              params: {
+                songId: item.id,
+                songName: item.name,
+                songDescription: item.description || '',
+                albumId: id,
+                albumTitle: title
+              }
+            });
+          },
+        },
+        {
+          text: t.common.delete,
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              t.albumChatList.deleteChatTitle,
+              t.albumChatList.deleteChatConfirm.replace('%{name}', item.name),
+              [
+                {
+                  text: t.common.cancel,
+                  style: 'cancel',
+                },
+                {
+                  text: t.common.delete,
+                  style: 'destructive',
+                  onPress: async () => {
+                    const success = await deleteSong(item.id);
+                    if (success) {
+                      refresh();
+                    } else {
+                      Alert.alert(t.common.error, t.albumChatList.deleteError);
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+        {
+          text: t.common.cancel,
+          style: 'cancel',
+        },
+      ]
+    );
+  };
 
   // Format timestamp for display
   const formatTimestamp = (timestamp: number) => {
@@ -58,7 +117,13 @@ export default function AlbumChatList() {
           </TouchableOpacity>
         </View>
         <Text style={styles.headerTitle}>{t.albumChatList.title}</Text>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => router.push({
+            pathname: '/(main)/album/create-song',
+            params: { albumId: id, albumTitle: title }
+          })}
+        >
           <Ionicons name="create-outline" size={24} color="#007AFF" />
         </TouchableOpacity>
       </View>
@@ -84,6 +149,7 @@ export default function AlbumChatList() {
                 pathname: '/(main)/chat/[id]',
                 params: { id: item.id }
               })}
+              onLongPress={() => handleLongPress(item)}
             />
           )}
           ItemSeparatorComponent={() => <View style={styles.separator} />}

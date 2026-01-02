@@ -7,6 +7,8 @@ export const es: Translations = {
     cancel: 'Cancelar',
     done: 'Listo',
     back: 'Atrás',
+    edit: 'Editar',
+    delete: 'Eliminar',
     error: 'Error',
     albums: 'Álbumes',
   },
@@ -26,6 +28,10 @@ export const es: Translations = {
     emptyTitle: 'Aún no hay chats',
     emptySubtitle: 'Inicia una nueva conversación',
     noMessagesYet: 'Aún no hay mensajes',
+    deleteChatTitle: 'Eliminar Chat',
+    deleteChatConfirm:
+      '¿Estás seguro que deseas eliminar "%{name}"? Esta acción no se puede deshacer.',
+    deleteError: 'Error al eliminar el chat',
   },
 
   // Create Album
@@ -48,6 +54,13 @@ export const es: Translations = {
     description: 'Descripción',
     descriptionPlaceholder: '¿De qué se trata este chat?',
     errorAlbumIdMissing: 'Falta el ID del álbum',
+  },
+
+  // Edit Song/Chat
+  editSong: {
+    title: 'Editar Chat',
+    editingIn: 'Editando en',
+    errorSongIdMissing: 'Falta el ID del chat',
   },
 
   // Chat Screen

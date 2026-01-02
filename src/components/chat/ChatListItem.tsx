@@ -10,22 +10,23 @@ interface ChatListItemProps {
   unreadCount?: number;
   tags?: string[];
   onPress?: () => void;
+  onLongPress?: () => void;
 }
 
-export function ChatListItem({ name, lastMessage, timestamp, avatarUrl, unreadCount, tags, onPress }: ChatListItemProps) {
+export function ChatListItem({ name, lastMessage, timestamp, avatarUrl, unreadCount, tags, onPress, onLongPress }: ChatListItemProps) {
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7} style={styles.container}>
+    <TouchableOpacity onPress={onPress} onLongPress={onLongPress} activeOpacity={0.7} style={styles.container}>
       {avatarUrl ? (
-        <Image 
-          source={{ uri: avatarUrl }} 
-          style={styles.avatar} 
+        <Image
+          source={{ uri: avatarUrl }}
+          style={styles.avatar}
         />
       ) : (
         <View style={[styles.avatar, styles.placeholder]}>
           <Ionicons name="chatbubble-ellipses" size={24} color="#8e8e93" />
         </View>
       )}
-      
+
       <View style={styles.contentContainer}>
         <View style={styles.topRow}>
           <Text style={styles.title} numberOfLines={1}>{name}</Text>

@@ -1,13 +1,13 @@
-import { db } from "../../client/sqlite";
-import { outbox } from "../../schema/sqlite";
-import { supabase } from "../../client/supabase";
-import { asc, eq } from "drizzle-orm";
+import { db } from '../../client/sqlite';
+import { outbox } from '../../schema/sqlite';
+import { supabase } from '../../client/supabase';
+import { asc, eq } from 'drizzle-orm';
 
 export async function pushSongs(userId: string) {
   const pending = await db
     .select()
     .from(outbox)
-    .where(eq(outbox.table, "songs"))
+    .where(eq(outbox.table, 'songs'))
     .orderBy(asc(outbox.createdAt));
 
   if (pending.length === 0) return;
@@ -31,7 +31,10 @@ export async function pushSongs(userId: string) {
     let tags: string[] | null = null;
     if (payload.tags) {
       try {
-        tags = typeof payload.tags === "string" ? JSON.parse(payload.tags) : payload.tags;
+        tags =
+          typeof payload.tags === 'string'
+            ? JSON.parse(payload.tags)
+            : payload.tags;
       } catch {
         tags = null;
       }
@@ -52,9 +55,16 @@ export async function pushSongs(userId: string) {
     };
   });
 
+  // Deduplicate rows, keeping the latest one based on ID
+  const uniqueRowsMap = new Map();
+  for (const row of rows) {
+    uniqueRowsMap.set(row.id, row);
+  }
+  const uniqueRows = Array.from(uniqueRowsMap.values());
+
   const { error } = await supabase
-    .from("songs")
-    .upsert(rows, { onConflict: "id", ignoreDuplicates: false });
+    .from('songs')
+    .upsert(uniqueRows, { onConflict: 'id', ignoreDuplicates: false });
 
   if (error) throw error;
 

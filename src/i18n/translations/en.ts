@@ -5,6 +5,8 @@ export const en = {
     cancel: 'Cancel',
     done: 'Done',
     back: 'Back',
+    edit: 'Edit',
+    delete: 'Delete',
     error: 'Error',
     albums: 'Albums',
   },
@@ -24,6 +26,10 @@ export const en = {
     emptyTitle: 'No chats yet',
     emptySubtitle: 'Start a new conversation',
     noMessagesYet: 'No messages yet',
+    deleteChatTitle: 'Delete Chat',
+    deleteChatConfirm:
+      'Are you sure you want to delete "%{name}"? This action cannot be undone.',
+    deleteError: 'Failed to delete chat',
   },
 
   // Create Album
@@ -46,6 +52,13 @@ export const en = {
     description: 'Description',
     descriptionPlaceholder: "What's this chat about?",
     errorAlbumIdMissing: 'Album ID is missing',
+  },
+
+  // Edit Song/Chat
+  editSong: {
+    title: 'Edit Chat',
+    editingIn: 'Editing in',
+    errorSongIdMissing: 'Song ID is missing',
   },
 
   // Chat Screen
@@ -90,6 +103,8 @@ export type Translations = {
     cancel: string;
     done: string;
     back: string;
+    edit: string;
+    delete: string;
     error: string;
     albums: string;
   };
@@ -104,6 +119,9 @@ export type Translations = {
     emptyTitle: string;
     emptySubtitle: string;
     noMessagesYet: string;
+    deleteChatTitle: string;
+    deleteChatConfirm: string;
+    deleteError: string;
   };
   createAlbum: {
     title: string;
@@ -122,6 +140,11 @@ export type Translations = {
     description: string;
     descriptionPlaceholder: string;
     errorAlbumIdMissing: string;
+  };
+  editSong: {
+    title: string;
+    editingIn: string;
+    errorSongIdMissing: string;
   };
   chat: {
     title: string;

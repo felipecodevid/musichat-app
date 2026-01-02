@@ -1,13 +1,13 @@
-import { db } from "../../client/sqlite";
-import { outbox } from "../../schema/sqlite";
-import { supabase } from "../../client/supabase";
-import { asc, eq, and } from "drizzle-orm";
+import { db } from '../../client/sqlite';
+import { outbox } from '../../schema/sqlite';
+import { supabase } from '../../client/supabase';
+import { asc, eq, and } from 'drizzle-orm';
 
 export async function pushMessages(userId: string) {
   const pending = await db
     .select()
     .from(outbox)
-    .where(eq(outbox.table, "messages"))
+    .where(eq(outbox.table, 'messages'))
     .orderBy(asc(outbox.createdAt));
 
   if (pending.length === 0) return;
@@ -42,9 +42,16 @@ export async function pushMessages(userId: string) {
     };
   });
 
+  // Deduplicate rows, keeping the latest one based on ID
+  const uniqueRowsMap = new Map();
+  for (const row of rows) {
+    uniqueRowsMap.set(row.id, row);
+  }
+  const uniqueRows = Array.from(uniqueRowsMap.values());
+
   const { error } = await supabase
-    .from("messages")
-    .upsert(rows, { onConflict: "id", ignoreDuplicates: false });
+    .from('messages')
+    .upsert(uniqueRows, { onConflict: 'id', ignoreDuplicates: false });
 
   if (error) throw error;
 
