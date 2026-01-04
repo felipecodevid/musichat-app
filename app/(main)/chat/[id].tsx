@@ -38,8 +38,13 @@ export default function ChatScreen() {
       type: 'audio',
       mediaUri: uri
     });
-    await sync();
-  }, [id, createMessage, sync, t.chat.audioMessage]);
+
+    // Optimistic update: refresh from local SQLite immediately
+    await refresh();
+
+    // Sync with server in background (don't await)
+    sync();
+  }, [id, createMessage, sync, refresh, t.chat.audioMessage]);
 
   const {
     isRecording,
