@@ -32,9 +32,12 @@ export default function Main() {
   );
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    // Use scope: 'local' to ensure local session is cleared on iOS
+    // The default 'global' scope requires network and can fail silently
+    await supabase.auth.signOut({ scope: 'local' });
     logout();
-    router.replace('/');
+    // Use dismissTo to navigate to root - works better on iOS with route groups
+    router.dismissTo('/');
   };
 
   return (

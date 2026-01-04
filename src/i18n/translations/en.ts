@@ -77,6 +77,10 @@ export const en = {
 
   // Auth Screen
   auth: {
+    chooseMethod: 'Choose how to sign in',
+    continueWithEmail: 'Continue with Email',
+    continueWithGoogle: 'Continue with Google',
+    or: 'or',
     welcomeBack: 'Welcome back',
     createAccount: 'Create your account',
     email: 'Email',
@@ -157,6 +161,10 @@ export type Translations = {
     runningMigrations: string;
   };
   auth: {
+    chooseMethod: string;
+    continueWithEmail: string;
+    continueWithGoogle: string;
+    or: string;
     welcomeBack: string;
     createAccount: string;
     email: string;

@@ -79,6 +79,10 @@ export const es: Translations = {
 
   // Auth Screen
   auth: {
+    chooseMethod: 'Elige cómo iniciar sesión',
+    continueWithEmail: 'Continuar con correo',
+    continueWithGoogle: 'Continuar con Google',
+    or: 'o',
     welcomeBack: 'Bienvenido de nuevo',
     createAccount: 'Crea tu cuenta',
     email: 'Correo electrónico',
