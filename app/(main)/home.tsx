@@ -1,4 +1,4 @@
-import { View, StyleSheet, FlatList, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, FlatList, Text, TouchableOpacity, ActivityIndicator, Platform } from 'react-native';
 import { useAuthStore } from '@/store/useAuth';
 import { supabase } from '@/db/client/supabase';
 import { useRouter } from 'expo-router';
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 30,
+    bottom: Platform.OS === 'android' ? 60 : 30,
     right: 30,
     width: 60,
     height: 60,

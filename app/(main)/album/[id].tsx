@@ -1,4 +1,4 @@
-import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Text, Alert, Platform } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 30,
+    bottom: Platform.OS === 'android' ? 60 : 30,
     right: 30,
     width: 60,
     height: 60,

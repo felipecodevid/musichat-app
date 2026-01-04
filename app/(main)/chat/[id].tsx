@@ -109,7 +109,7 @@ export default function ChatScreen() {
 
       {/* Input Area */}
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior="padding"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}
       >
         <View style={styles.inputContainer}>
@@ -124,13 +124,13 @@ export default function ChatScreen() {
             </View>
           ) : (
             <>
-              <TouchableOpacity style={styles.iconButton}>
+              {/* <TouchableOpacity style={styles.iconButton}>
                 <Ionicons name="add" size={24} color="#007AFF" />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
-              <TouchableOpacity style={styles.iconButton}>
+              {/* <TouchableOpacity style={styles.iconButton}>
                 <Ionicons name="images-outline" size={24} color="#007AFF" />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <TextInput
                 style={styles.input}
